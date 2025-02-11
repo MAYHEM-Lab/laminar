@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <array>
 
 #include "../df_interface.h"
 #include "type_system/ts_type.h"

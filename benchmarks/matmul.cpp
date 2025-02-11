@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "../df_interface.h"
 #include "type_system/ts_type.h"
