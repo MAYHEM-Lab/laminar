@@ -347,16 +347,6 @@ printf("fire_operand: output_woof: %s, value: %f\n",
 int get_result(const int ns, const int id, operand* const res, const unsigned long itr) {
     std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
 
-    // size_t pos = woof_name.find_last_of('/');
-    // std::string uri;
-    // if (pos != std::string::npos) {
-    //     uri = woof_name.substr(0, pos + 1);  // Keep up to and including the '/'
-    // } else {
-    //     uri = woof_name;  // No '/' found, keep the original string
-    // }
-
-    // std::cout << "gengen11 " << uri << std::endl;
-
     // wait till output log has atleast itr number of results
     while (woof_last_seq(woof_name) < itr) {}
     //while(WooFGetLatestSeqno(woof_name.c_str()) < itr){}
@@ -568,4 +558,89 @@ std::string graphviz_representation() {
     g += "\n}";
 
     return g;
+}
+
+struct ts_value* load_value(const struct ts_value* const unloaded_value, int ns, int id){
+    std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
+
+    size_t pos = woof_name.find_last_of('/');
+    std::string uri;
+    if (pos != std::string::npos) {
+        uri = woof_name.substr(0, pos + 1);  // Keep up to and including the '/'
+    } else {
+        uri = "";
+    }
+
+    struct ts_value* return_value = new ts_value;
+
+    return_value->type = unloaded_value->type;
+    switch (unloaded_value->type) {
+        case TS_UNINITIALIZED:
+        case TS_UNKNOWN: {
+            free(return_value);
+            return NULL;
+        }
+        case TS_ERROR:
+        case TS_EXCEPTION:
+        case TS_BOOLEAN:
+        case TS_BYTE:
+        case TS_SHORT:
+        case TS_INTEGER:
+        case TS_LONG:
+        case TS_UNSIGNED_BYTE:
+        case TS_UNSIGNED_SHORT:
+        case TS_UNSIGNED_INTEGER:
+        case TS_UNSIGNED_LONG:
+        case TS_FLOAT:
+        case TS_DOUBLE:
+        case TS_TIMESTAMP: 
+	case TS_PRIM_STRING: {
+            if (!value_deep_set(unloaded_value, return_value)) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+        case TS_PRIM_LARGE_STRING: {
+            if (!value_deep_set(unloaded_value, return_value)) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+        case TS_PRIM_2D_DOUBLE_ARRAY: {
+            for (size_t i = 0; i < TS_PRIM_2D_DOUBLE_ARRAY_ROWS; i++) {
+                for (size_t j = 0; j < TS_PRIM_2D_DOUBLE_ARRAY_COLS; j++) {
+                    return_value->value.ts_prim_2d_double_array[i][j] = unloaded_value->value.ts_prim_2d_double_array[i][j];
+                }
+            }
+        } break;
+        case TS_PRIM_DOUBLE_ARRAY: {
+            if (!value_deep_set(unloaded_value, return_value)) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+#ifndef ESP8266
+        case TS_STRING: {
+            // assume always local
+            return_value->value.ts_string = unloaded_value->value.ts_string;
+            if (!load_string_value(&return_value->value.ts_string, uri.c_str())) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+        case TS_ARRAY: {
+            // assume always local
+            return_value->value.ts_array = unloaded_value->value.ts_array;
+            if (!load_array_value(&return_value->value.ts_array, uri.c_str())) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+#endif
+        default: {
+            free(return_value);
+            return NULL;
+        }
+    }
+    return return_value;
 }

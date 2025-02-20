@@ -38,7 +38,7 @@ int main() {
 
 
         operand result;
-        get_result(ns, 2, &result, 1);
+        get_result(ns, 1, &result, 1);
         ts_value* loaded_result = load_value(&result.operand_value);
 
         uint8_t result_array[3];
@@ -50,9 +50,9 @@ int main() {
     }
     else{
         operand result;
-        get_result(ns, 2, &result, 1);
+        get_result(ns, 1, &result, 1);
         std::cout << "hi1" << std::endl;
-        ts_value* loaded_result = load_value(&result.operand_value);
+        ts_value* loaded_result = load_value(&result.operand_value, ns, 1);
         std::cout << "hi2" << std::endl;
         if(loaded_result == NULL){
             std::cout << "null"<<std::endl;

@@ -45,4 +45,6 @@ std::string generate_woof_host_url(int host_id);
 
 std::string graphviz_representation();
 
+struct ts_value* load_value(const struct ts_value* const unloaded_value, int ns, int id);
+
 #endif // DF_INTERFACE_H

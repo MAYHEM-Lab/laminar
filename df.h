@@ -5,9 +5,11 @@
 #define CSPOTDEVICE
 #include "df_operations.h"
 #include "ts_types.h"
+#include "ts_type.h"
 #else
 #include "operation_system/df_operations.h"
 #include "type_system/ts_types.h"
+#include "type_system/ts_type.h"
 #endif
 
 #include <cmath>

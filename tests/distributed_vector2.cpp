@@ -40,7 +40,7 @@ int main() {
 
         operand result;
         get_result(ns, 3, &result, 1);
-        ts_value* loaded_result = load_value(&result.operand_value);
+        ts_value* loaded_result = load_value(&result.operand_value, ns, 3);
 
         uint8_t result_array[3];
         get_unsigned_byte_array(result_array, loaded_result);
@@ -52,7 +52,7 @@ int main() {
     else{
         operand result;
         get_result(ns, 2, &result, 1);
-        ts_value* loaded_result = load_value(&result.operand_value);
+        ts_value* loaded_result = load_value(&result.operand_value, ns, 2);
 
         uint8_t result_array[3];
         get_unsigned_byte_array(result_array, loaded_result);

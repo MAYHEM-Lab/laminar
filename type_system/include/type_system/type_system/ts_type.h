@@ -17,6 +17,9 @@ extern "C" {
  */
 struct ts_value* load_value(const struct ts_value* unloaded_value);
 
+bool load_string_value(struct ts_value_string* string, const char* uri);
+bool load_array_value(struct ts_value_array* array, const char* uri);
+
 /**
  * Function to store value. Note the type system will modify information inside the storage system of the value.
  * These need to be written to the MAIN WooF otherwise information is lost.
