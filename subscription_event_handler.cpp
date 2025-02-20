@@ -22,13 +22,13 @@ operand perform_operation(const std::vector<operand>& operands,
                           const struct df_operation operation,
                           struct df_operation_metadata* const operation_metadata,
                           const std::vector<subscription>& input_hosts) {
-    for(int i = 0; i < input_hosts.size(); i++){
-        log_debug("[gengen] [namespace:%d][node_id:%d] %s", 
-            input_hosts[i].ns,
-            input_hosts[i].id,
-            generate_woof_path(OUT_WF_TYPE, input_hosts[i].ns, input_hosts[i].id));
-        std::cout << generate_woof_path(OUT_WF_TYPE, input_hosts[i].ns, input_hosts[i].id) << std::endl;
-    }
+    // for(int i = 0; i < input_hosts.size(); i++){
+    //     log_debug("[gengen] [namespace:%d][node_id:%d] %s", 
+    //         input_hosts[i].ns,
+    //         input_hosts[i].id,
+    //         generate_woof_path(OUT_WF_TYPE, input_hosts[i].ns, input_hosts[i].id));
+    //     std::cout << generate_woof_path(OUT_WF_TYPE, input_hosts[i].ns, input_hosts[i].id) << std::endl;
+    // }
     const unsigned long operand_count = operands.size();
     struct ts_value* operands_array[operand_count];
     const struct ts_value* const_operands_array[operand_count];

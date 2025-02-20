@@ -348,6 +348,7 @@ int get_result(const int ns, const int id, operand* const res, const unsigned lo
     std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
 
     // wait till output log has atleast itr number of results
+    while (WooFInvalid(woof_last_seq(woof_name))) {}
     while (woof_last_seq(woof_name) < itr) {}
     //while(WooFGetLatestSeqno(woof_name.c_str()) < itr){}
 
