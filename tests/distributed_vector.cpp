@@ -28,42 +28,42 @@ int main() {
     subscribe(ns, 1, 0, ns, 2);
     laminar_setup();
 
-    if (curr_host_id == 1){
-        uint8_t array[] = {1, 2, 3};
-        struct ts_value* operand_value = value_from_unsigned_byte_array(array, 3);
-        operand op(operand_value, 1);
-        write_value(&op.operand_value);
-        fire_operand(ns, 2, &op);
-        value_deep_delete(operand_value);
+    for (unsigned long long itr = 1; itr < 30; itr++){
+        std::cout << "itr: " << itr << std::endl;
+        if (curr_host_id == 1){
+            uint8_t array[] = {1, 2, 3};
+            struct ts_value* operand_value = value_from_unsigned_byte_array(array, 3);
+            operand op(operand_value, itr);
+            write_value(&op.operand_value);
+            fire_operand(ns, 2, &op);
+            value_deep_delete(operand_value);
 
+            sleep(1);
 
-        operand result;
-        get_result(ns, 1, &result, 1);
-        ts_value* loaded_result = load_value(&result.operand_value);
+            std::cout << "gets: " << (int)woof_last_seq(generate_woof_path(OUT_WF_TYPE, ns, 1)) << std::endl;
+            operand result;
+            get_result(ns, 1, &result, itr);
+            ts_value* loaded_result = load_value(&result.operand_value);
 
-        uint8_t result_array[3];
-        get_unsigned_byte_array(result_array, loaded_result);
+            uint8_t result_array[3];
+            get_unsigned_byte_array(result_array, loaded_result);
 
-        for(int i = 0; i < sizeof(result_array); i++){
-            std::cout << (int)result_array[i] << std::endl;
+            for(int i = 0; i < sizeof(result_array); i++){
+                std::cout << (int)result_array[i] << std::endl;
+            }
         }
-    }
-    else{
-        operand result;
-        get_result(ns, 1, &result, 1);
-        std::cout << "hi1" << std::endl;
-        ts_value* loaded_result = load_value(&result.operand_value, ns, 1);
-        std::cout << "hi2" << std::endl;
-        if(loaded_result == NULL){
-            std::cout << "null"<<std::endl;
-        }
+        else{
+            std::cout << "gets: " << (int)woof_last_seq(generate_woof_path(OUT_WF_TYPE, ns, 1)) << std::endl;
+            operand result;
+            get_result(ns, 1, &result, itr);
+            ts_value* loaded_result = load_value(&result.operand_value, ns, 1);
 
-        uint8_t result_array[3];
-        get_unsigned_byte_array(result_array, loaded_result);
-        std::cout << "hi3" << std::endl;
+            uint8_t result_array[3];
+            get_unsigned_byte_array(result_array, loaded_result);
 
-        for(int i = 0; i < sizeof(result_array); i++){
-            std::cout << (int)result_array[i] << std::endl;
+            for(int i = 0; i < sizeof(result_array); i++){
+                std::cout << (int)result_array[i] << std::endl;
+            }
         }
     }
 
