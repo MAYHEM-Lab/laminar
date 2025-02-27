@@ -155,8 +155,8 @@ int main(int argc, char **argv) {
     laminar_reset(); /* reset setup data structures */
 
     set_host(curr_host_id);
-    add_host(1, "169.231.230.190", "/home/ubuntu/laminar/build/bin/");
-    add_host(2, "169.231.230.3", "/home/ubuntu/laminar/build/bin/");
+    add_host(1, "169.231.230.190", "/disk2/cspot-namespace-platform/");
+    add_host(2, "169.231.230.3", "/disk2/cspot-namespace-platform/");
     laminar_init();
     
     // Matrix set up
