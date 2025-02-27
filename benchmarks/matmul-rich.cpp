@@ -26,7 +26,7 @@ void transpose(std::vector<std::vector<int>>& m) {
 }
 
 void matmul() {
-    system("sudo find . -name \"laminar*\" -delete");
+    system("sudo find . -name \"lmr*\" -delete");
     laminar_reset(); /* reset setup data structures */
     set_host(1);
     add_host(1, "127.0.0.1", "/home/centos/cspot/build/bin/");
@@ -158,7 +158,7 @@ int a[8192][8192];
 int b[8192][8192];
 
 double matmul_partition(const int mat_size, int n_partitions, bool timing) {
-    system("sudo find . -name \"laminar*\" -delete");
+    system("sudo find . -name \"lmr*\" -delete");
     laminar_reset(); /* reset setup data structures */
     set_host(1);
     add_host(1, "127.0.0.1", "/home/centos/cspot/build/bin/");

@@ -329,18 +329,20 @@ void add_operand(const int ns, const int host_id, const int id) {
 
 void fire_operand(const int ns, const int id, const operand* const op, const bool trigger_handler) {
     std::string output_woof = generate_woof_path(OUT_WF_TYPE, ns, id);
-    unsigned long long curr_itr = (unsigned long long)woof_last_seq(output_woof);
+    // unsigned long long curr_itr = (unsigned long long)woof_last_seq(output_woof);
+
     // fire only if the iteration number is 1 more then the previous iteration
-printf("fire_operand: output_woof: %s, value: %f\n",
+    printf("fire_operand: output_woof: %s, value: %f\n",
 		output_woof.c_str(),
 		op->operand_value.value.ts_double);
+    
+    while (WooFInvalid(woof_last_seq(output_woof))) {}
+    while (woof_last_seq(output_woof) + 1 != op->itr) {}
 
-    if (curr_itr + 1 == op->itr) {
-        if (!trigger_handler) {
-            woof_put(output_woof, "", op);
-        } else {
-            woof_put(output_woof, OUTPUT_HANDLER, op);
-        }
+    if (!trigger_handler) {
+        woof_put(output_woof, "", op);
+    } else {
+        woof_put(output_woof, OUTPUT_HANDLER, op);
     }
 }
 
