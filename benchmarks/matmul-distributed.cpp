@@ -32,7 +32,7 @@ int b[8192][8192];
 //     {3, 1, 4, 2}
 // };
 
-bool TIMING = true;
+bool TIMING = false;
 
 int curr_host_id = 2;
 

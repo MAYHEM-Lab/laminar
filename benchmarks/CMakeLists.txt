@@ -73,6 +73,15 @@ target_link_libraries(matmul-rich
         PRIVATE ts_array
         PRIVATE ts_matrix)
 
+add_executable(matmul-dist-simple
+        matmul-dist-simple.cpp)
+target_link_libraries(matmul-dist-simple
+        PRIVATE df_interface
+        PRIVATE ts_type
+        PRIVATE df_operation
+        PRIVATE ts_array
+        PRIVATE ts_matrix)
+
 add_executable(matmul-distributed
         matmul-distributed.cpp)
 target_link_libraries(matmul-distributed

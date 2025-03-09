@@ -24,7 +24,7 @@ void set_host(int host_id);
 void add_host(int host_id,
               const std::string& host_ip,
               const std::string& woof_path,
-              enum RetryType retry_type = RETRY_EXPONENTIAL_BACKOFF);
+              enum RetryType retry_type = RETRY_LINEAR_BACKOFF);
 
 void add_node(int ns, int host_id, int id, struct df_operation operation);
 void add_operand(int ns, int host_id, int id);

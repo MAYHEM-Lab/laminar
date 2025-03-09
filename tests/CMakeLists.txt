@@ -8,6 +8,11 @@ target_link_libraries(distributed_addition
         PRIVATE ts_array
         PRIVATE ts_matrix)
 
+add_executable(distributed_two distributed_two.cpp)
+target_link_libraries(distributed_two
+        PRIVATE df_interface
+        PRIVATE ts_type)
+
 add_executable(distributed_vector distributed_vector.cpp)
 target_link_libraries(distributed_vector
         PRIVATE df_interface
