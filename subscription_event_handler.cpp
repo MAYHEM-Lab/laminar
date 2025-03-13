@@ -179,6 +179,7 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
         if (cached_last_output.op.itr == curr_itr) {
             // Operand for this seq has already been found and cached. Retrieve from cache and proceed
             op_values[input_index] = cached_last_output.op;
+            input_hosts[input_index] = subscription(cached_last_output.input_ns, cached_last_output.input_id);
             log_debug("[input:%lu] Already retrieved, continue", input_index);
             log_debug("[input:%lu] END input processing", input_index);
             continue;
@@ -337,7 +338,7 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
                                 input_index,
                                 subscription_operand.itr,
                                 new_sequence_number);
-            const cached_output new_cached_output = cached_output(subscription_operand, new_sequence_number);
+            const cached_output new_cached_output = cached_output(subscription_operand, new_sequence_number, input_subscription.ns, input_subscription.id);
             woof_put(last_used_sub_pos_woof, "", &new_cached_output);
         }
 

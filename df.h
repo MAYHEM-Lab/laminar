@@ -80,11 +80,15 @@ struct operand {
 struct cached_output {
     operand op;
     unsigned long long seq; // CSPOT seq in output woof
+    int input_ns;
+    int input_id;
 
     // Defaults execution iteration and seq to 0 so initial access is thrown out and updated
-    explicit cached_output(const operand& op = operand(nullptr, 0), unsigned long long seq = 0)
+    explicit cached_output(const operand& op = operand(nullptr, 0), unsigned long long seq = 0, int input_ns = -1, int input_id = -1)
         : op(op)
-        , seq(seq) {
+        , seq(seq)
+        , input_ns(input_ns)
+        , input_id(input_id) {
     }
 };
 
