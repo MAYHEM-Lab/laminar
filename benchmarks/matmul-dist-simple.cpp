@@ -39,42 +39,45 @@ int main(int argc, char **argv) {
     add_host(2, "169.231.230.3", "/disk2/cspot-namespace-platform/");
 
     add_node(ns, 1, 1, {DF_CUSTOM, MATRIX_MULTIPLY});
-    add_node(ns, 2, 2, {DF_CUSTOM, MATRIX_MULTIPLY});
 
     // Inputs
-    add_operand(ns, 1, 3); // a
-    add_operand(ns, 1, 4); // b
-    add_operand(ns, 1, 5); // c
+    add_operand(ns, 1, 2); // a
+    add_operand(ns, 2, 3); // b
 
-    subscribe(ns, 1, 0, ns, 3);
-    subscribe(ns, 1, 1, ns, 4);
-    subscribe(ns, 2, 0, ns, 1);
-    subscribe(ns, 2, 1, ns, 5);
+    subscribe(ns, 1, 0, ns, 2);
+    subscribe(ns, 1, 1, ns, 3);
 
     /* Run program */
     laminar_setup();
-    if(curr_host_id == 1){
+    if (curr_host_id == 1) {
+        fire_matrix(a, 2, 1);
+    }
+    else{
         fire_matrix(a, 3, 1);
-        fire_matrix(a, 4, 1);
-        fire_matrix(a, 5, 1);
     }
-    // get result
-    operand result;
-    int err = get_result(ns, 2, &result, 1);
-    if (err < 0) {
-        std::cout << "Failed to read the result " << std::endl;
-    }
-    ts_value* const result_value = load_value(&result.operand_value, ns, 2);
-    // print it out
-    int result_matrix[MAT_SIZE][MAT_SIZE];
-    get_integer_matrix(result_matrix, result_value);
-    for (size_t i = 0; i < MAT_SIZE; i++) {
-        for (size_t j = 0; j < MAT_SIZE; j++) {
-            std::cout << result_matrix[i][j] << " ";
+    for (unsigned long long itr = 1; itr < 31; itr++) {
+        operand result;
+        int err = get_result(ns, 1, &result, itr);
+        if (err < 0) {
+            std::cout << "Failed to read the result " << std::endl;
         }
-        std::cout << std::endl;
+        ts_value* const result_value = load_value(&result.operand_value, ns, 1);
+        int result_matrix[MAT_SIZE][MAT_SIZE];
+                
+        get_integer_matrix(result_matrix, result_value);
+        for (int i = 0; i < MAT_SIZE; i++) {
+            for (int j = 0; j < MAT_SIZE; j++) {
+                std::cout << result_matrix[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+        if (curr_host_id == 1) {
+            fire_matrix(a, 2, itr+1);
+        }
+        else{
+            fire_matrix(result_matrix, 3, itr+1);
+        }
     }
-    return 0;
 }
 
 void fire_matrix(int matrix[MAT_SIZE][MAT_SIZE], int id, unsigned long long itr){
