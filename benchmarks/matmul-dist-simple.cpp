@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     
     set_host(curr_host_id);
     add_host(1, "169.231.230.190", "/disk2/cspot-namespace-platform/");
-    add_host(2, "169.231.230.3", "/disk2/cspot-namespace-platform/");
+    add_host(2, "169.231.230.247", "/disk2/cspot-namespace-platform/");
 
     add_node(ns, 1, 1, {DF_CUSTOM, MATRIX_MULTIPLY});
 

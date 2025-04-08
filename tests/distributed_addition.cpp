@@ -16,7 +16,7 @@ int main() {
     int curr_host_id = 2;
     set_host(curr_host_id);
     add_host(1, "169.231.230.190", "/disk2/cspot-namespace-platform/");
-    add_host(2, "169.231.230.3", "/disk2/cspot-namespace-platform/");
+    add_host(2, "169.231.230.247", "/disk2/cspot-namespace-platform/");
     
     // Nodes is on device 1: (namespace, host, node)
 
