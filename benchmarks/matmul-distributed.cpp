@@ -1,3 +1,6 @@
+// Test file testing distributed array capabilities - multiplies two matrix inputs fromtwo machines - 30 seperate times. 
+// Written by Krish & Gen 
+
 #include <unistd.h>
 
 #include <chrono>

@@ -1,3 +1,5 @@
+// Test file testing distributed array capabilities - multiplies a matrix by itself and the result of previous iteration - distributed across two hosts. 
+// Written by Krish & Gen 
 #include <unistd.h>
 
 #include <chrono>

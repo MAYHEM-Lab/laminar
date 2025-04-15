@@ -24,7 +24,7 @@ void set_host(int host_id);
 void add_host(int host_id,
               const std::string& host_ip,
               const std::string& woof_path,
-              enum RetryType retry_type = RETRY_LINEAR_BACKOFF);
+              enum RetryType retry_type = RETRY_EXPONENTIAL_BACKOFF);
 
 void add_node(int ns, int host_id, int id, struct df_operation operation);
 void add_operand(int ns, int host_id, int id);
@@ -45,6 +45,7 @@ std::string generate_woof_host_url(int host_id);
 
 std::string graphviz_representation();
 
+// overloaded load_value in c++ form, for aggregate data types
 struct ts_value* load_value(const struct ts_value* const unloaded_value, int ns, int id);
 
 #endif // DF_INTERFACE_H

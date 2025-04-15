@@ -1,3 +1,7 @@
+// passing a vector of unsigned bytes between two hosts
+// with 2 nodes so we can achieve some synchronization
+// Written by Krish & Gen 
+
 #include "../df_interface.h"
 #include "type_system/ts_type.h"
 #include "type_system/types/ts_array.h"

@@ -17,6 +17,7 @@ extern "C" {
  */
 struct ts_value* load_value(const struct ts_value* unloaded_value);
 
+// used in df_interface.cpp for overloaded load_value
 bool load_string_value(struct ts_value_string* string, const char* uri);
 bool load_array_value(struct ts_value_array* array, const char* uri);
 

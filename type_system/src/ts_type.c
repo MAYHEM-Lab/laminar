@@ -170,7 +170,8 @@ void* woof_get_array_value(const char* const woof_id, size_t value_size, const s
 
 bool load_array_value(struct ts_value_array* const array, const char* uri) { // NOLINT(misc-no-recursion)
     char woof_id[200];
-    // STRATEGY 
+    // if url is not null, use it to create the woof_id
+    // else use the default woof_id
     if (uri){
         strcpy(woof_id, uri);
         strcat(woof_id, TS_STORAGE_PREFIX);

@@ -1,3 +1,7 @@
+// passing a vector of unsigned bytes between two hosts
+// with 1 node, has 1 sec wait between each iteration
+// Written by Krish & Gen 
+
 #include "../df_interface.h"
 #include "type_system/ts_type.h"
 #include "type_system/types/ts_array.h"

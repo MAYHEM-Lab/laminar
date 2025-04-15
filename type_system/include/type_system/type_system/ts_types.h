@@ -78,7 +78,6 @@ struct ts_storage_system {
     uint8_t id[16];      // Unique identifier for composite items. Can but must not be used in combination with the
                          // uuid.h library.
     size_t element_size; // Absolute element size of composite item in bytes.
-    // char uri[200];
 };
 
 

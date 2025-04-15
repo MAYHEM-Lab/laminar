@@ -1,3 +1,7 @@
+// passing a double from one host to another
+// testing simple distributed capabilities
+// Written by Krish & Gen 
+
 #include "../df_interface.h"
 #include "type_system/types/ts_primitive.h"
 

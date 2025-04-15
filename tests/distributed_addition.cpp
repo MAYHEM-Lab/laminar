@@ -1,3 +1,6 @@
+// run a distributed addition operation on two devices.
+// Written by Krish & Gen 
+
 #include "../df_interface.h"
 #include "type_system/types/ts_primitive.h"
 

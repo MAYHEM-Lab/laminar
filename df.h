@@ -84,6 +84,7 @@ struct cached_output {
     int input_id;
 
     // Defaults execution iteration and seq to 0 so initial access is thrown out and updated
+    // We are now storing the source of the cached outputs so we can fetch later in case of aggregate data 
     explicit cached_output(const operand& op = operand(nullptr, 0), unsigned long long seq = 0, int input_ns = -1, int input_id = -1)
         : op(op)
         , seq(seq)
