@@ -67,20 +67,19 @@ void WooFChangeBody()
 printf("body: restarting i: %d c: %d\n",iteration,cycle);
 	}
 
-	memset(telemetry_string,0,sizeof(telemetry_string));
-
-	// made to run as a cronjob -- read stdin for latest telemetry value
-	err = read(0,telemetry_string,sizeof(telemetry_string)-1);
-	if(err <= 0) {
-		printf("woof-change-body: read failed cycle: %d, iteration: %d\n",
-				iteration,cycle);
-		fflush(stdout);
-		exit(1);
-	}
-	telemetry_value = atof(telemetry_string);
 
 
 	if(get_curr_host_id() == 1) {
+		memset(telemetry_string,0,sizeof(telemetry_string));
+	// made to run as a cronjob -- read stdin for latest telemetry value
+		err = read(0,telemetry_string,sizeof(telemetry_string)-1);
+		if(err <= 0) {
+			printf("woof-change-body: read failed cycle: %d, iteration: %d\n",
+				iteration,cycle);
+			fflush(stdout);
+			exit(1);
+		}
+		telemetry_value = atof(telemetry_string);
 		//gettimeofday(&tm,NULL);
 		//bench_start_time = (double)tm.tv_sec + (tm.tv_usec / 1000000.0); // sec
 		op_node = cycle + DUTYCYCLECOUNT;
@@ -106,7 +105,7 @@ printf("body: restarting i: %d c: %d\n",iteration,cycle);
 	*/
 	if(get_curr_host_id() == 2) {
 		operand result;
-		sleep(60);
+//		sleep(60);
 		int err = get_result(ns, 4, &result, iteration);
 		if (err < 0) {
 			std::cout << "Failed to read first result " << std::endl;
