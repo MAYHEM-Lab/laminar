@@ -33,13 +33,15 @@
 extern "C" {
 #endif
 
-void Anomaly2HostsSetUp() 
+#define DUTYCYCLECOUNT (5)
+
+void WooFChangeSetUp() 
 {
 	struct timeval tm;
 	double ts;
 	double bench_start_time;
 	double bench_end_time;
-	int duty_cycle_count = 5;
+	int duty_cycle_count = DUTYCYCLECOUNT;
 	int i;
 	int op_node; 
 	int iteration;
@@ -50,26 +52,26 @@ void Anomaly2HostsSetUp()
 
 
 #ifndef ESP8266
-	system("sudo rm -f lmr* RE* KS* CO* ANOMALY.state");
+	system("sudo rm -f lmr* RE* KS* CO* WOOFCHANE.state");
 #endif
 	laminar_init();
 	laminar_reset();
-	seqno = WooFGetLatestSeqno("ANOMALY.state");
+	seqno = WooFGetLatestSeqno("WOOFCHANGE.state");
 	if((seqno == -1) || (seqno == 0)) {
 		state[0] = 1; // starting iteration
 		state[1] = 0; // starting cycle
-		err = WooFCreate("ANOMALY.state",2*sizeof(int),2);
+		err = WooFCreate("WOOFCHANGE.state",2*sizeof(int),2);
 		if(err < 0) {
-			printf("anomaly-test-setup: could not create state woof\n");
+			printf("woof-change-setup: could not create state woof\n");
 			exit(1);
 		}
-		seqno = WooFPut("ANOMALY.state",NULL,(void *)state);
+		seqno = WooFPut("WOOFCHANGE.state",NULL,(void *)state);
 		if(seqno == -1) {
-			printf("anomaly-test-setup: failed to put state\n");
+			printf("woof-change-setup: failed to put state\n");
 			exit(1);
 		}
 	} else {
-		printf("anomaly-test-setup: restarting, setup exiting\n");
+		printf("woof-change-setup: restarting, setup exiting\n");
 		return;
 	}
 
@@ -87,9 +89,9 @@ void Anomaly2HostsSetUp()
 	// two node computes REGRESS test on node 2
 	// two node computes CORR test on node 2
 	// two node computes ANOMALY test on node 2
-	add_node(ns, 2, 1, {DF_CUSTOM, KS_TEST});
-	add_node(ns, 2, 2, {DF_CUSTOM, REGRESS_TEST});
-	add_node(ns, 2, 3, {DF_CUSTOM, CORR_TEST});
+	add_node(ns, 1, 1, {DF_CUSTOM, KS_TEST});
+	add_node(ns, 1, 2, {DF_CUSTOM, REGRESS_TEST});
+	add_node(ns, 1, 3, {DF_CUSTOM, CORR_TEST});
 	add_node(ns, 2, 4, {DF_CUSTOM, ANOMALY_TEST});
 
 
@@ -97,7 +99,7 @@ void Anomaly2HostsSetUp()
 	// use op_node variable to give the virtual node ids
 	// note that virtual graph boundary nodes must begin
 	// 1 higher than actual nodes
-	op_node = 5;
+	op_node = duty_cycle_count;
 	for(i=0; i < duty_cycle_count; i++) {
 		add_operand(ns, 1, op_node); // value from graph boundary on host 1
 	/*
@@ -129,7 +131,7 @@ void Anomaly2HostsSetUp()
 
 #ifndef CSPOTDEVICE
 int main() {
-	Anomaly2HostsSetUp();
+	WooFChangeSetUp();
 	return 0;
 }
 #endif

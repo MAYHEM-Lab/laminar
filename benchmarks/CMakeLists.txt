@@ -104,3 +104,15 @@ target_link_libraries(msg_stress_test
         PRIVATE df_interface
         PRIVATE df_operation
         PRIVATE ts_type)
+add_executable(woof_change_setup
+        woof-change-setup.cpp)
+target_link_libraries(woof_change_setup
+        PRIVATE df_interface
+        PRIVATE df_operation
+        PRIVATE ts_type)
+add_executable(woof_change_body
+        woof-change-body.cpp)
+target_link_libraries(woof_change_body
+        PRIVATE df_interface
+        PRIVATE df_operation
+        PRIVATE ts_type)

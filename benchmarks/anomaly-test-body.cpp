@@ -115,6 +115,7 @@ printf("body: restarting i: %d c: %d\n",iteration,cycle);
 		*/
 		if(get_curr_host_id() == 2) {
 			operand result;
+			sleep(60);
 			int err = get_result(ns, 4, &result, iteration);
 			if (err < 0) {
 				std::cout << "Failed to read first result " << std::endl;
