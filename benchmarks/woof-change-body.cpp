@@ -29,7 +29,7 @@
 #include "type_system/types/ts_string.h"
 #endif
 
-#define DUTYCYCLECOUNT 5
+#define DUTYCYCLECOUNT 6
 
 #ifdef CSPOTDEVICE
 extern "C" {
