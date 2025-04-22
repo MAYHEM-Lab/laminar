@@ -33,6 +33,7 @@
 extern "C" {
 #endif
 
+#define FIRSTOP (5)
 #define DUTYCYCLECOUNT (6)
 
 void WooFChangeSetUp() 
@@ -52,7 +53,7 @@ void WooFChangeSetUp()
 
 
 #ifndef ESP8266
-	system("sudo rm -f lmr* RE* KS* CO* WOOFCHANE.state");
+	system("sudo rm -f lmr* RE* KS* CO* WOOFCHANGE.state");
 #endif
 	laminar_init();
 	laminar_reset();
@@ -75,7 +76,7 @@ void WooFChangeSetUp()
 		return;
 	}
 
-	set_host(2);
+	set_host(1);
 //	add_host(1, "169.231.230.148", "/cspot-device-namespace/");
 //	add_host(1, "169.231.230.191", "/devices/feather-1/");
 //	add_host(1, "169.231.230.191", "/devices/linux@169.231.230.148/");
@@ -99,7 +100,7 @@ void WooFChangeSetUp()
 	// use op_node variable to give the virtual node ids
 	// note that virtual graph boundary nodes must begin
 	// 1 higher than actual nodes
-	op_node = duty_cycle_count;
+	op_node = FIRSTOP;
 	for(i=0; i < duty_cycle_count; i++) {
 		add_operand(ns, 1, op_node); // value from graph boundary on host 1
 	/*

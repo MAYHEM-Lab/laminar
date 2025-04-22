@@ -29,6 +29,7 @@
 #include "type_system/types/ts_string.h"
 #endif
 
+#define FIRSTOP 5
 #define DUTYCYCLECOUNT 6
 
 #ifdef CSPOTDEVICE
@@ -82,7 +83,7 @@ printf("body: restarting i: %d c: %d\n",iteration,cycle);
 		telemetry_value = atof(telemetry_string);
 		//gettimeofday(&tm,NULL);
 		//bench_start_time = (double)tm.tv_sec + (tm.tv_usec / 1000000.0); // sec
-		op_node = cycle + DUTYCYCLECOUNT;
+		op_node = cycle + FIRSTOP;
 		//struct ts_value operands[duty_cycle_count];
 		struct ts_value my_operand;
 		set_double(&my_operand,telemetry_value); // simulated measurement
