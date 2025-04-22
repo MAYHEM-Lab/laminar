@@ -11,7 +11,8 @@
 int main() {
     int ns = 1; // Namespace
     int hd = 1; // Host device
-
+    system("sudo find . -name \"lmr*\" -delete");
+    laminar_reset(); /* reset setup data structures */
     laminar_init();
 
     // Set up single device on localhost

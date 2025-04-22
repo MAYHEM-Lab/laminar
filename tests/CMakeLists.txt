@@ -1,5 +1,36 @@
 add_subdirectory(type_system)
 
+add_executable(distributed_addition distributed_addition.cpp)
+target_link_libraries(distributed_addition
+        PRIVATE df_interface
+        PRIVATE ts_type
+        PRIVATE df_operation
+        PRIVATE ts_array
+        PRIVATE ts_matrix)
+
+add_executable(distributed_two distributed_two.cpp)
+target_link_libraries(distributed_two
+        PRIVATE df_interface
+        PRIVATE ts_type)
+
+add_executable(distributed_vector distributed_vector.cpp)
+target_link_libraries(distributed_vector
+        PRIVATE df_interface
+        PRIVATE ts_type
+        PRIVATE df_operation
+        PRIVATE ts_array
+        PRIVATE ts_matrix
+        PRIVATE ts_string)
+
+add_executable(distributed_vector2 distributed_vector2.cpp)
+target_link_libraries(distributed_vector2
+        PRIVATE df_interface
+        PRIVATE ts_type
+        PRIVATE df_operation
+        PRIVATE ts_array
+        PRIVATE ts_matrix
+        PRIVATE ts_string)
+
 add_executable(multinode_regression multinode_regression.cpp)
 target_link_libraries(multinode_regression
         PRIVATE df_interface

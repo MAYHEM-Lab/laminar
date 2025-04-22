@@ -5,9 +5,11 @@
 #define CSPOTDEVICE
 #include "df_operations.h"
 #include "ts_types.h"
+#include "ts_type.h"
 #else
 #include "operation_system/df_operations.h"
 #include "type_system/ts_types.h"
+#include "type_system/ts_type.h"
 #endif
 
 #include <cmath>
@@ -78,11 +80,16 @@ struct operand {
 struct cached_output {
     operand op;
     unsigned long long seq; // CSPOT seq in output woof
+    int input_ns;
+    int input_id;
 
     // Defaults execution iteration and seq to 0 so initial access is thrown out and updated
-    explicit cached_output(const operand& op = operand(nullptr, 0), unsigned long long seq = 0)
+    // We are now storing the source of the cached outputs so we can fetch later in case of aggregate data 
+    explicit cached_output(const operand& op = operand(nullptr, 0), unsigned long long seq = 0, int input_ns = -1, int input_id = -1)
         : op(op)
-        , seq(seq) {
+        , seq(seq)
+        , input_ns(input_ns)
+        , input_id(input_id) {
     }
 };
 

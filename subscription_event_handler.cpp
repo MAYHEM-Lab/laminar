@@ -20,12 +20,14 @@
 
 operand perform_operation(const std::vector<operand>& operands,
                           const struct df_operation operation,
-                          struct df_operation_metadata* const operation_metadata) {
+                          struct df_operation_metadata* const operation_metadata,
+                          const std::vector<subscription>& input_hosts) {
     const unsigned long operand_count = operands.size();
     struct ts_value* operands_array[operand_count];
     const struct ts_value* const_operands_array[operand_count];
     for (size_t i = 0; i < operand_count; ++i) {
-        operands_array[i] = load_value(&operands[i].operand_value);
+        // Load the operand value, in case if aggregate data
+        operands_array[i] = load_value(&operands[i].operand_value, input_hosts[i].ns, input_hosts[i].id);
         const_operands_array[i] = operands_array[i];
         if (const_operands_array[i] == nullptr) {
             log_error("Could not load value [input:%lu]", i);
@@ -157,6 +159,8 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
     log_debug("[namespace:%d][node_id:%d] has %lu inputs", node_namespace, node_id, input_count);
     // Scan through subscription outputs and collect operands
     std::vector<operand> op_values(input_count);
+    // Create a vector of subscriptions to hold the source hosts of the operands
+    std::vector<subscription> input_hosts(input_count);
     for (unsigned long input_index = 0; input_index < input_count; input_index++) {
         log_debug("[input:%lu] START input processing", input_index);
         // Get last used output and seqno for this port
@@ -177,6 +181,8 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
         if (cached_last_output.op.itr == curr_itr) {
             // Operand for this seq has already been found and cached. Retrieve from cache and proceed
             op_values[input_index] = cached_last_output.op;
+            // Save the source of the cached output in case if need to fetch aggregate data later when performing operation
+            input_hosts[input_index] = subscription(cached_last_output.input_ns, cached_last_output.input_id);
             log_debug("[input:%lu] Already retrieved, continue", input_index);
             log_debug("[input:%lu] END input processing", input_index);
             continue;
@@ -203,6 +209,9 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
                 input_subscription.ns,
                 input_subscription.id,
                 input_subscription.port);
+
+        // set the operand input host
+        input_hosts[input_index] = input_subscription;
 
         // Get relevant operand from subscription output (if it exists)
         std::string subscription_output_woof =
@@ -334,7 +343,7 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
                                 input_index,
                                 subscription_operand.itr,
                                 new_sequence_number);
-            const cached_output new_cached_output = cached_output(subscription_operand, new_sequence_number);
+            const cached_output new_cached_output = cached_output(subscription_operand, new_sequence_number, input_subscription.ns, input_subscription.id);
             woof_put(last_used_sub_pos_woof, "", &new_cached_output);
         }
 
@@ -441,7 +450,7 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
                                                                         .write_value = true,
                                                                         .output_woof_path = output_woof.c_str()}};
     log_debug("Firing operation %d\n",n.id);
-    operand result = perform_operation(op_values, n.operation, &operation_metadata);
+    operand result = perform_operation(op_values, n.operation, &operation_metadata, input_hosts);
     log_debug("Fired operation %d\n",n.id);
 
     const unsigned long long last_output_sequence_number = (unsigned long long)woof_last_seq(output_woof);

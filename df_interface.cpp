@@ -329,18 +329,17 @@ void add_operand(const int ns, const int host_id, const int id) {
 
 void fire_operand(const int ns, const int id, const operand* const op, const bool trigger_handler) {
     std::string output_woof = generate_woof_path(OUT_WF_TYPE, ns, id);
-    unsigned long long curr_itr = (unsigned long long)woof_last_seq(output_woof);
-    // fire only if the iteration number is 1 more then the previous iteration
-printf("fire_operand: output_woof: %s, value: %f\n",
-		output_woof.c_str(),
-		op->operand_value.value.ts_double);
+    // unsigned long long curr_itr = (unsigned long long)woof_last_seq(output_woof);
 
-    if (curr_itr + 1 == op->itr) {
-        if (!trigger_handler) {
-            woof_put(output_woof, "", op);
-        } else {
-            woof_put(output_woof, OUTPUT_HANDLER, op);
-        }
+    // Spin waits that check the validity of the newest iteration and whether iteration 
+    while (WooFInvalid(woof_last_seq(output_woof))) {}
+    // fire only if the iteration number is 1 more then the previous iteration
+    while (woof_last_seq(output_woof) + 1 != op->itr) {}
+    
+    if (!trigger_handler) {
+        woof_put(output_woof, "", op);
+    } else {
+        woof_put(output_woof, OUTPUT_HANDLER, op);
     }
 }
 
@@ -348,6 +347,7 @@ int get_result(const int ns, const int id, operand* const res, const unsigned lo
     std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
 
     // wait till output log has atleast itr number of results
+    while (WooFInvalid(woof_last_seq(woof_name))) {}
     while (woof_last_seq(woof_name) < itr) {}
     //while(WooFGetLatestSeqno(woof_name.c_str()) < itr){}
 
@@ -558,4 +558,90 @@ std::string graphviz_representation() {
     g += "\n}";
 
     return g;
+}
+
+// overloaded load_value with ns and id for aggregate data types
+struct ts_value* load_value(const struct ts_value* const unloaded_value, int ns, int id){
+    std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
+
+    size_t pos = woof_name.find_last_of('/');
+    std::string uri;
+    if (pos != std::string::npos) {
+        uri = woof_name.substr(0, pos + 1);  // Keep up to and including the '/'
+    } else {
+        uri = "";
+    }
+
+    struct ts_value* return_value = new ts_value;
+
+    return_value->type = unloaded_value->type;
+    switch (unloaded_value->type) {
+        case TS_UNINITIALIZED:
+        case TS_UNKNOWN: {
+            free(return_value);
+            return NULL;
+        }
+        case TS_ERROR:
+        case TS_EXCEPTION:
+        case TS_BOOLEAN:
+        case TS_BYTE:
+        case TS_SHORT:
+        case TS_INTEGER:
+        case TS_LONG:
+        case TS_UNSIGNED_BYTE:
+        case TS_UNSIGNED_SHORT:
+        case TS_UNSIGNED_INTEGER:
+        case TS_UNSIGNED_LONG:
+        case TS_FLOAT:
+        case TS_DOUBLE:
+        case TS_TIMESTAMP: 
+	case TS_PRIM_STRING: {
+            if (!value_deep_set(unloaded_value, return_value)) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+        case TS_PRIM_LARGE_STRING: {
+            if (!value_deep_set(unloaded_value, return_value)) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+        case TS_PRIM_2D_DOUBLE_ARRAY: {
+            for (size_t i = 0; i < TS_PRIM_2D_DOUBLE_ARRAY_ROWS; i++) {
+                for (size_t j = 0; j < TS_PRIM_2D_DOUBLE_ARRAY_COLS; j++) {
+                    return_value->value.ts_prim_2d_double_array[i][j] = unloaded_value->value.ts_prim_2d_double_array[i][j];
+                }
+            }
+        } break;
+        case TS_PRIM_DOUBLE_ARRAY: {
+            if (!value_deep_set(unloaded_value, return_value)) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+#ifndef ESP8266
+        case TS_STRING: {
+            // assume always local
+            return_value->value.ts_string = unloaded_value->value.ts_string;
+            if (!load_string_value(&return_value->value.ts_string, uri.c_str())) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+        case TS_ARRAY: {
+            // assume always local
+            return_value->value.ts_array = unloaded_value->value.ts_array;
+            if (!load_array_value(&return_value->value.ts_array, uri.c_str())) {
+                free(return_value);
+                return NULL;
+            }
+        } break;
+#endif
+        default: {
+            free(return_value);
+            return NULL;
+        }
+    }
+    return return_value;
 }

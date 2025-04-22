@@ -16,14 +16,15 @@
 
 int main() {
     int ns = 1; // Laminar Namespace (not CSPOT's)
-
+    system("sudo find . -name \"lmr*\" -delete");
+    laminar_reset(); /* reset setup data structures */
     laminar_init();
 
     // Set up two devices (change IPs and/or cspot namespaces)
     int curr_host_id = 2;
     set_host(curr_host_id);
-    add_host(1, "169.231.230.183", "/cspot-device-namespace/");
-    add_host(2, "169.231.230.225", "/cspot-device-namespace/");
+    add_host(1, "169.231.230.190", "/disk2/cspot-namespace-platform/");
+    add_host(2, "169.231.230.247", "/disk2/cspot-namespace-platform/");
 
     // Nodes
 
