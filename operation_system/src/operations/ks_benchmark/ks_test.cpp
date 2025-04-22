@@ -7,7 +7,7 @@ extern "C" {
 
 #include "redblack.h"
 
-#define DEFAULT_BLOCKSIZE (6)
+#define DEFAULT_BLOCKSIZE (10)
 
 
 

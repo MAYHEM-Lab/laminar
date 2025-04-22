@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-#define DUTYCYCLECOUNT (5)
+#define DUTYCYCLECOUNT (6)
 
 void WooFChangeSetUp() 
 {
