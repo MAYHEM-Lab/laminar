@@ -24,7 +24,8 @@ printf("ANOMALY: ks: %d regress: %d corr: %d\n",ks_test,regress_test,corr_test);
 	 * if it fails a ks_test and a regression test but there is
 	 * significant correlation, no anomaly
 	 */
-	if((ks_test == 0) || (regress_test == 0) || (corr_test == 1)) {
+	//if((ks_test == 0) || (regress_test == 0) || (corr_test == 1)) {
+	if((ks_test == 0) && (regress_test == 0) && (corr_test == 1)) {
 		result->value.ts_int = 0;
 	} else {
 		result->value.ts_int = 1;
