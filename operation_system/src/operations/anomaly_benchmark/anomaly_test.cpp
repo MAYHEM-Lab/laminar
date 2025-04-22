@@ -18,6 +18,7 @@ int anomaly_test_node(const struct ts_value* const* operands,
 	int ks_test = operands[0]->value.ts_int; // KS is on port 0
 	int regress_test = operands[1]->value.ts_int; // regress on port 1
 	int corr_test = operands[2]->value.ts_int; // CORR on port 2
+	int vote;
 printf("ANOMALY: ks: %d regress: %d corr: %d\n",ks_test,regress_test,corr_test);
 
 	/*
@@ -25,7 +26,10 @@ printf("ANOMALY: ks: %d regress: %d corr: %d\n",ks_test,regress_test,corr_test);
 	 * significant correlation, no anomaly
 	 */
 	//if((ks_test == 0) || (regress_test == 0) || (corr_test == 1)) {
-	if((ks_test == 0) && (regress_test == 0) && (corr_test == 1)) {
+	//if((ks_test == 0) && (regress_test == 0) && (corr_test == 1)) {
+	corr_test = 1 - corr_test;
+	vote = ks_test + regress_test + corr_test;
+	if(vote <= 1) {
 		result->value.ts_int = 0;
 	} else {
 		result->value.ts_int = 1;
