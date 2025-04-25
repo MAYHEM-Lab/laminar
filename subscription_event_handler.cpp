@@ -70,7 +70,7 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
 //printf("subscription handler started\n");
 
     int err;
-    int max_retries = 10;
+    int max_retries = 100000;
 
     // Get name of this woof
 #ifdef CSPOTDEVICE

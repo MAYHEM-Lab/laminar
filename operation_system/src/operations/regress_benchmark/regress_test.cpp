@@ -161,6 +161,7 @@ int regress_test_node(const struct ts_value* const* operands,
 	/*
 	 * if previous ival or previous rval in this confidence bound, no anomaly
 	 */
+#if 0
 	if((rc.y_int > ci->data[0 * ci->xdim + 0]) &&
 	   (rc.y_int < ci->data[0 * ci->xdim + 1])) {
 		test_val = 0;
@@ -171,6 +172,20 @@ printf("REGRESS: return 0, y_int: %f, low: %f, high: %f\n",
 		test_val = 0;
 printf("REGRESS: return 0, slope: %f, low: %f, high: %f\n",
 		rc.slope,ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1]);
+	} else {
+printf("REGRESS: return 1, slope: %f, low: %f, high: %f y_int: %f low: %f high: %f\n",
+		rc.slope,ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1],
+		rc.y_int,ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1]);
+		test_val = 1;
+	}
+#endif
+	if((rc.y_int > ci->data[0 * ci->xdim + 0]) &&
+	   (rc.y_int < ci->data[0 * ci->xdim + 1]) &&
+	   (rc.slope > ci->data[1 * ci->xdim + 0]) &&
+           (rc.slope < ci->data[1 * ci->xdim + 1])) {
+printf("REGRESS: return 0, y_int: %f, low: %f, high: %f\n",
+		rc.y_int,ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1]);
+		test_val = 0;
 	} else {
 printf("REGRESS: return 1, slope: %f, low: %f, high: %f y_int: %f low: %f high: %f\n",
 		rc.slope,ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1],
