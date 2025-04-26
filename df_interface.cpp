@@ -331,7 +331,7 @@ void fire_operand(const int ns, const int id, const operand* const op, const boo
     std::string output_woof = generate_woof_path(OUT_WF_TYPE, ns, id);
     unsigned long long curr_itr = (unsigned long long)woof_last_seq(output_woof);
     // fire only if the iteration number is 1 more then the previous iteration
-//printf("fire_operand: output_woof: %s, value: %f\n",
+printf("fire_operand: output_woof: %s, value: %f\n",
 		output_woof.c_str(),
 		op->operand_value.value.ts_double);
 
