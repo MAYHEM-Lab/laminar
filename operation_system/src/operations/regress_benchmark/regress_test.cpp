@@ -117,9 +117,19 @@ int regress_test_node(const struct ts_value* const* operands,
 		j--;
 	}
 
+	int diff = 0;
 	for(i=0; i < operand_count; i++) {
 //printf("x[%d]: %f y[%d]: %f\n",i,x->data[i*2+1],i,y->data[i]);
+		if(x->data[i*2+1] != y->data[i]) {
+			diff = 1;
+			break;
+		}
 	}
+	if(diff == 0) { // no regression possible
+		result->value.ts_int = 0; // no anomaly
+		return 1;
+	}
+		
 	/*
 	 * generate coefficients
 	 */
@@ -127,6 +137,7 @@ int regress_test_node(const struct ts_value* const* operands,
 	if(coef == NULL) {
 		printf("regress_test_node: regression failed\n");
 		result->value.ts_int = 0;
+		return 1;
 	}
 	ival = coef->data[0];
 	rval = coef->data[1];

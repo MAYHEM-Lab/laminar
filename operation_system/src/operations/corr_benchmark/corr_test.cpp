@@ -20,6 +20,11 @@ double CORR(double *ds1, double *ds2, int size, double *tval)
 	double t;
 	int i;
 
+	if((size == 0) || (size == 1)) {
+		*tval = 0;
+		return(0.0);
+	}
+
 	/*
 	 * compute the means
 	 */
@@ -52,6 +57,11 @@ double CORR(double *ds1, double *ds2, int size, double *tval)
 
 	rval = ((acc / (double)size) - f_mu*g_mu) / 
 		(sqrt(((double)size-1)*f_var/(double)size) * sqrt(((double)size-1)*g_var/(double)size));
+
+	if(rval == 1.0) {
+		*tval = 0;
+		return(0.0);
+	}
 	
 	t = (rval*sqrt((double)size-2.0)) / (sqrt(1.0 - rval*rval));
 	*tval = t;
