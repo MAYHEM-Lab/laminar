@@ -150,7 +150,7 @@ std::string generate_woof_host_url(int host_id) {
         	std::cout << "Error read the host info for URL for host id: " << std::to_string(host_id) << std::endl;
         	exit(1);
     	}
-printf("generate_woof_host_url: %s for id %d\n",h.host_url,host_id);
+//printf("generate_woof_host_url: %s for id %d\n",h.host_url,host_id);
     	return(h.host_url);
     } else {
 	return("");
@@ -346,23 +346,63 @@ printf("fire_operand: output_woof: %s, value: %f\n",
 
 int get_result(const int ns, const int id, operand* const res, const unsigned long itr) {
     std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
+    int ierr;
+    unsigned long iseqno;
 
     // wait till output log has atleast itr number of results
-    while (woof_last_seq(woof_name) < itr) {sleep(1);}
+    while(1) {
+//printf("wf: %s, iseqno: %lu, itr: %lu\n",woof_name.c_str(),iseqno,itr);
+//fflush(stdout);
+    	iseqno = woof_last_seq(woof_name);
+	if(iseqno == (unsigned long)-1) {
+        	std::cerr << "ERROR -- get last seqno for itr " << itr << " failed\n";
+		return(-1);
+	}
+	if(iseqno >= itr) {
+		break;
+	}
+	sleep(1);
+    }
+   // while (woof_last_seq(woof_name) < itr) {sleep(1);}
     //while(WooFGetLatestSeqno(woof_name.c_str()) < itr){}
 
     // keep checking down till the result is of iteration itr
     operand last_op;
     unsigned long seqno = itr;
-    woof_get(woof_name, &last_op, seqno);
+    ierr = woof_get(woof_name, &last_op, seqno);
+    if(ierr < 0) {
+        std::cerr << "ERROR -- get [" << itr << "] at " << iseqno << " from " << woof_name << " failed\n";
+	return(-1);
+    }
+//printf("lastop: wf: %s, seqno: %lu, itr: %lu lastitr: %lu\n",woof_name.c_str(),seqno,itr,last_op.itr);
+//fflush(stdout);
 
     while (last_op.itr != (unsigned long long)itr) {
         // std::cout << last_op.itr << " : " << itr << " : " << seqno <<  std::endl;
         // wait till the next seqno is populated with result
         seqno++;
-        while (woof_last_seq(woof_name) < seqno) {sleep(1);}
+	while(1) {
+		iseqno = woof_last_seq(woof_name);
+//printf("lastop iseq: wf: %s, seqno: %lu, iseqno: %lu itr: %lu lastitr: %lu\n",woof_name.c_str(),seqno,iseqno,itr,last_op.itr);
+//fflush(stdout);
+		if(iseqno == (unsigned long)-1) {
+        		std::cerr << "ERROR -- get last seqno  from " << woof_name << " failed\n";
+			return(-1);
+		}
+		if(iseqno >= seqno) {
+			break;
+		}
+		sleep(1);
+	}
+        //while (woof_last_seq(woof_name) < seqno) {sleep(1);}
         //while (WooFGetLatestSeqno(woof_name.c_str()) < seqno) {}
-        woof_get(woof_name, &last_op, seqno);
+        ierr = woof_get(woof_name, &last_op, seqno);
+//printf("get iseq: wf: %s, seqno: %lu, iseqno: %lu itr: %lu lastitr: %lu\n",woof_name.c_str(),seqno,iseqno,itr,last_op.itr);
+//fflush(stdout);
+	if(ierr < 0) {
+        std::cerr << "ERROR -- get [" << itr << "] at " << seqno << " from " << woof_name << " failed\n";
+		return(-1);
+	}
     }
 
     // fill the result when ready
