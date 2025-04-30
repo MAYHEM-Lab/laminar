@@ -119,13 +119,13 @@ int regress_test_node(const struct ts_value* const* operands,
 
 	int diff = 0;
 	for(i=0; i < operand_count; i++) {
-//printf("x[%d]: %f y[%d]: %f\n",i,x->data[i*2+1],i,y->data[i]);
+printf("x[%d]: %f y[%d]: %f\n",i,x->data[i*2+1],i,y->data[i]);
 		if(x->data[i*2+1] != y->data[i]) {
 			diff = 1;
-			break;
 		}
 	}
 	if(diff == 0) { // no regression possible
+printf("REGRESS: same data, exiting\n");
 		result->value.ts_int = 0; // no anomaly
 		return 1;
 	}
@@ -135,7 +135,7 @@ int regress_test_node(const struct ts_value* const* operands,
 	 */
 	coef = RegressMatrix2D(x,y);
 	if(coef == NULL) {
-		printf("regress_test_node: regression failed\n");
+		printf("REGRESS: regression failed\n");
 		result->value.ts_int = 0;
 		return 1;
 	}
@@ -157,6 +157,7 @@ int regress_test_node(const struct ts_value* const* operands,
 		woof_put(regress_woof,"",&rc);
 		FreeArray2D(ci);
 		result->value.ts_int = 0;
+printf("REGRESS: no previous rc\n");
 		return 1;
 	} else {
 		err = woof_get(regress_woof,&rc,rseqno);
@@ -189,7 +190,6 @@ printf("REGRESS: return 1, slope: %f, low: %f, high: %f y_int: %f low: %f high: 
 		rc.y_int,ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1]);
 		test_val = 1;
 	}
-#endif
 	if((rc.y_int > ci->data[0 * ci->xdim + 0]) &&
 	   (rc.y_int < ci->data[0 * ci->xdim + 1]) &&
 	   (rc.slope > ci->data[1 * ci->xdim + 0]) &&
@@ -201,6 +201,31 @@ printf("REGRESS: return 0, y_int: %f, low: %f, high: %f\n",
 printf("REGRESS: return 1, slope: %f, low: %f, high: %f y_int: %f low: %f high: %f\n",
 		rc.slope,ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1],
 		rc.y_int,ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1]);
+		test_val = 1;
+	}
+#endif
+	// test if y=x is regression line
+	if((0 > ci->data[0 * ci->xdim + 0]) &&
+	   (0 < ci->data[0 * ci->xdim + 1]) &&
+	   (1 > ci->data[1 * ci->xdim + 0]) &&
+           (1 < ci->data[1 * ci->xdim + 1])) {
+printf("REGRESS: return 0, y_int: 0 low: %f, high: %f slope: 1 low: %f high: %f \n",
+		ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1],
+		ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1]);
+		test_val = 0;
+	} else if((rc.y_int > ci->data[0 * ci->xdim + 0]) &&
+	   (rc.y_int < ci->data[0 * ci->xdim + 1]) &&
+	   (rc.slope > ci->data[1 * ci->xdim + 0]) &&
+           (rc.slope < ci->data[1 * ci->xdim + 1])) {
+printf("REGRESS: return 0, y_int: %f low: %f, high: %f slope: %f low: %f high: %f \n",
+		rc.y_int, ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1],
+		rc.slope, ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1]);
+		test_val = 0;
+	} else {
+
+printf("REGRESS: return 1, y_int low: %f, high: %f slope low: %f high: %f \n",
+		ci->data[0 * ci->xdim + 0],ci->data[0 * ci->xdim + 1],
+		ci->data[1 * ci->xdim + 0],ci->data[1 * ci->xdim + 1]);
 		test_val = 1;
 	}
 

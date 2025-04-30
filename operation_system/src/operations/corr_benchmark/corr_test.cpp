@@ -170,7 +170,10 @@ int corr_test_node(const struct ts_value* const* operands,
 		crit = 2.776; // value fo 4 df in case oper cnt is 6
 	}
 
-printf("CORR test: corr: %f, crit: %f\n",corr,tval);
+	if(tval < 0) {
+		tval = tval * -1.0;
+	}
+printf("CORR test: corr: %f, t: %f crit: %f\n",corr,tval,crit);
 
 	if((tval > (-1.0*crit)) && (tval < crit)) {
 		result->value.ts_int = 0; // no corrrelation
