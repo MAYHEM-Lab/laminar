@@ -126,6 +126,10 @@ printf("x[%d]: %f y[%d]: %f\n",i,x->data[i*2+1],i,y->data[i]);
 	}
 	if(diff == 0) { // no regression possible
 printf("REGRESS: same data, exiting\n");
+		for(i=0; i < operand_count; i++) {
+			dval = operands[i]->value.ts_double;
+			woof_put(history_woof,"",&dval);
+		}
 		result->value.ts_int = 0; // no anomaly
 		return 1;
 	}
@@ -136,6 +140,10 @@ printf("REGRESS: same data, exiting\n");
 	coef = RegressMatrix2D(x,y);
 	if(coef == NULL) {
 		printf("REGRESS: regression failed\n");
+		for(i=0; i < operand_count; i++) {
+			dval = operands[i]->value.ts_double;
+			woof_put(history_woof,"",&dval);
+		}
 		result->value.ts_int = 0;
 		return 1;
 	}

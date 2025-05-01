@@ -55,11 +55,21 @@ double CORR(double *ds1, double *ds2, int size, double *tval)
 		acc += (ds1[i]*ds2[i]);
 	}
 
+	if(((double)size-1)*f_var/((double)size) < 0) {
+		*tval = 0.0;
+		return(0.0);
+	}
+
+	if(((double)size-1)*g_var/((double)size) < 0) {
+		*tval = 0.0;
+		return(0.0);
+	}
+
 	rval = ((acc / (double)size) - f_mu*g_mu) / 
 		(sqrt(((double)size-1)*f_var/(double)size) * sqrt(((double)size-1)*g_var/(double)size));
 
-	if(rval == 1.0) {
-		*tval = 0;
+	if((rval*rval) >= 1.0) {
+		*tval = 100.0;
 		return(0.0);
 	}
 	
