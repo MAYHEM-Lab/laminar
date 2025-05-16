@@ -4,6 +4,13 @@
 #include "df_interface.h"
 
 #include "df.h"
+/* Making the logging system accessible here for uniformity sake
+*/
+#ifndef ESP8266
+#include "logger_system/df_logger.h"
+#else
+#include "df_logger.h"
+#endif
 
 #include <chrono>
 #include <iostream>
@@ -38,6 +45,49 @@ std::map<int, std::set<node>> nodes;
 std::set<host> hosts;
 
 enum SetupState setup_state;
+
+/**
+ * Get/Set the app_id -- this is called after laminar_setup by the app
+ */
+static std::string app_id;
+void set_app_id(std::string str) {
+    /* Laminar apps should pass in a unique appID to laminar_init
+     * and then call this with the same appID after laminar_setup
+     * to enable multiple apps to run in the same namespace.
+     */
+    app_id = "_" + str;
+}
+std::string get_app_id() {
+    /* This is called by generate_woof_path which uses the app_id
+     * to create the prefix for each of the laminar-specific woofs
+     */
+    return app_id;
+}
+/**
+ * Called from handlers to set their own static app_id variable from the woof_path
+ * Will retrieve laminar app_id from woof path: lmr here is ns_prefix
+ * woof://host_url/lmrAPPID.woof_type.node_id -> APPID
+ * woof://host_url/lmrAPPID-*.woof_type.node_id -> APPID
+ * sets the process-global app_id
+ * @param woof_path complete woof_path as reference
+ * @return -1 on error, 0 otherwise
+ */
+int set_app_id_from_woof_path(const std::string& woof_path) {
+    const size_t pos = woof_path.find('_');
+    if (pos == std::string::npos) { 
+        log_error("get_app_id_from_woof_path: ns_prefix %s NOT FOUND! %s", (std::string(ns_prefix)).c_str(), woof_path.c_str());
+        return -1;
+    }
+    const std::string app_id_plus_rest = woof_path.substr(pos); //it starts with the underscore!
+    const size_t dash = app_id_plus_rest.find('-');
+    if (dash != std::string::npos) { 
+        app_id = app_id_plus_rest.substr(0, dash);
+    } else {
+        const size_t first_dot = app_id_plus_rest.find('.');
+        app_id = app_id_plus_rest.substr(0, first_dot);
+    }
+    return 0;
+}
 
 int get_curr_host_id() {
     int curr_host_id;
@@ -92,7 +142,7 @@ void retry_sleep(enum RetryType retry_type, int retry_itr) {
 std::string generate_woof_path(
     const DFWoofType woof_type, const int ns, const int node_id, int host_id, const int port_id) {
     std::string host_url;
-    std::string woof_prefix = "lmr";
+    std::string woof_prefix = std::string(ns_prefix) + get_app_id();
 
     // if it is a global woof to a host then ns is -1
     if (ns == -1) {
@@ -142,7 +192,7 @@ std::string generate_woof_path(
 std::string generate_woof_host_url(int host_id) {
     std::string host_url;
     host h;
-    std::string woof_prefix = "lmr";
+    std::string woof_prefix = std::string(ns_prefix) + get_app_id();
 
     if(host_id != get_curr_host_id()) {
     	int err = woof_get(woof_prefix + "." + DFWOOFTYPE_STR[HOSTS_WF_TYPE], &h, host_id);
@@ -183,10 +233,26 @@ int get_ns_from_woof_path(const std::string& woof_path) {
     return std::stoi(ns_str);
 }
 
-void laminar_init() {
+void laminar_init(std::string appid_arg) {
+    /* Laminar apps should pass in a unique appID here and after laminar_setup
+     * using set_app_id(appid_arg); to enable multiple apps to run in the 
+     * same namespace.
+     */
 #ifndef ESP8266
     WooFInit();
 #endif
+    // Set the app_id: APP is the default if nothing passed in,
+    // which will conflict if there are multiple apps
+    app_id = "_" + appid_arg;
+    if (appid_arg == "APP") { //APP is the default value passed in, see df_interface.h
+        log_error("laminar_init: Warning -- app_id is not set -- so multiple apps in the same namespace will collide!! Set it by passing in a app-unique string to laminar_init");
+    }
+    // if the app_id contains a . or -, the parser will fail, so disallow this
+    if (app_id.find('.') != std::string::npos
+                || app_id.find('-') != std::string::npos) {
+        log_error("laminar_init: app_id cannot contain a dot or dash: %s", app_id.c_str());
+        exit(1);
+    }
 
     std::string setup_state_woof = generate_woof_path(SETUP_ST_WF_TYPE);
     // check if setup state exists; if not then create it and set state as STARTED

@@ -23,6 +23,7 @@ add_library(df_interface
         df_interface.h)
 target_link_libraries(df_interface
         PRIVATE woof
+        PRIVATE df_logger
         PRIVATE ts_type
         PUBLIC df_operation)
 
