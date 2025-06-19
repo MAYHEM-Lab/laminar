@@ -17,7 +17,7 @@ int main() {
 
     // Set up single device on localhost
     set_host(1);
-    add_host(1, "169.231.230.191", "/home/ubuntu/src/laminar/build/bin/");
+    add_host(1, "localhost", "/home/ubuntu/src/laminar/build/bin/");
 
     // Nodes
 
