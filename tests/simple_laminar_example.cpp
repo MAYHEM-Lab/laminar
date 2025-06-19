@@ -12,11 +12,12 @@ int main() {
     int ns = 1; // Namespace
     int hd = 1; // Host device
 
+    system("rm -f lmr*");
     laminar_init();
 
     // Set up single device on localhost
     set_host(1);
-    add_host(1, "localhost", "/home/centos/cspot-apps/build/bin/");
+    add_host(1, "169.231.230.191", "/home/ubuntu/src/laminar/build/bin/");
 
     // Nodes
 
@@ -54,7 +55,7 @@ int main() {
     fire_operand(ns, id_b, &op_b);
 
     struct ts_value value_c{};
-    set_double(&value_c, 3);
+    set_double(&value_c, 4);
     operand op_c(&value_c, 1);
     fire_operand(ns, id_c, &op_c);
 
