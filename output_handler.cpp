@@ -29,6 +29,9 @@ extern "C" int output_handler(WOOF* wf, unsigned long seqno, void* ptr) {
     const int node_namespace = get_ns_from_woof_path(woof_name);
     // Extract id
     const unsigned long node_id = get_node_id_from_woof_path(woof_name);
+    int err = set_app_id_from_woof_path(woof_name);
+    log_debug("output_handler: app_id info %s %s", (std::string(ns_prefix)).c_str(), woof_name.c_str());
+
 
     log_debug_with_value("woof: %s, [namespace:%d][node_id:%d][seqno:%lu] has result: [iteration:%lu]",
                          &result->operand_value,
