@@ -18,17 +18,19 @@ static std::string appID = "CJK1";
 int main() {
     int ns = 1; // Laminar Namespace (not CSPOT's)
 
-    //laminar_init(); //if this uncommented, comment out set_app_id(...) below
+    /* Leaving off the appID in laminar_init tells Laminar to use "APP" for the appID
+     * If you have multiple apps using APP as the appID in the same namespace
+     * they will collide and interfere with each other.  It is fine to use
+     * the default appID APP if you only have one app in the namespace at a time.
+     */
+    //laminar_init(); //if you uncomment this, also comment out set_app_id(...) below
     laminar_init(appID); //if an appID is passed id, make sure and also pass it in below via set_app_id after laminar_setup
-
 
     // Set up two devices (change IPs and/or cspot namespaces)
     int curr_host_id = 2;
     set_host(curr_host_id);
-    //add_host(1, "169.231.230.183", "/cspot-device-namespace/");
-    //add_host(2, "169.231.230.225", "/cspot-device-namespace/");
-    add_host(1, "172.17.0.2", "/dkr-namespace1/");
-    add_host(2, "172.17.0.2", "/dkr-namespace2/");
+    add_host(1, "169.231.230.183", "/cspot-device-namespace/");
+    add_host(2, "169.231.230.225", "/cspot-device-namespace/");
 
     // Nodes
 
