@@ -243,6 +243,6 @@ and complete.
 To run multiple apps in the same namespace, you must configure each app to have a different appID (which you must set on all host on which the app is deployed). By default the appID is APP.  If you do not set the appID, apps with the same appID (e.g. APP) will conflict and cause undefined errors.
  
 You set the appID in two places in your handler code (i.e. in the preamble and in the function).  In the preamble, pass in the appID (string constant) to `laminar_init(appID)`.  In the function, pass in the same appID to `set_app_id(appID)` at the start of code body.  Ensure that appID is the same in both function calls.  If you don't set the appID (APP will be used by default), comment out the call to `set_app_id(...)`.  See this file for an example that sets the appID:
-/home/ubuntu/laminar/tests/distributed_simple_laminar_example.cpp
+.../tests/distributed_simple_laminar_example.cpp
 
 Once changed, recompile the app and distribute it to each host (ensuring that curr\_host\_id is set correctly on each).
