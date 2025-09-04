@@ -644,7 +644,9 @@ std::string graphviz_representation() {
             n++;
 
             if (!(n->operation.category == DF_INTERNAL && n->operation.operation == DF_INTERNAL_OPERAND)) {
-                s++;
+		if(s != subscriptions[ns].end()) {
+                	s++;
+		}
             }
         }
 
