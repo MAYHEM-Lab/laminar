@@ -4,6 +4,13 @@
 #include "df_interface.h"
 
 #include "df.h"
+/* Making the logging system accessible here for uniformity sake
+*/
+#ifndef ESP8266
+#include "logger_system/df_logger.h"
+#else
+#include "df_logger.h"
+#endif
 
 #include <chrono>
 #include <iostream>
@@ -21,7 +28,7 @@
 #else
 #define OUTPUT_WOOF_SIZE 3000
 #define SUBSCRIPTION_EVENTS_WOOF_SIZE 3000
-#define SUBSCRIPTION_EVENTS_SNC_WOOF_SIZE 16
+#define SUBSCRIPTION_EVENTS_SNC_WOOF_SIZE 3000
 #define NODE_STATE_WOOF_SIZE 3000
 #define SUBSCRIPTION_POS_WOOF_SIZE 3000
 #endif
@@ -38,6 +45,49 @@ std::map<int, std::set<node>> nodes;
 std::set<host> hosts;
 
 enum SetupState setup_state;
+
+/**
+ * Get/Set the app_id -- this is called after laminar_setup by the app
+ */
+static std::string app_id;
+void set_app_id(std::string str) {
+    /* Laminar apps should pass in a unique appID to laminar_init
+     * and then call this with the same appID after laminar_setup
+     * to enable multiple apps to run in the same namespace.
+     */
+    app_id = "_" + str;
+}
+std::string get_app_id() {
+    /* This is called by generate_woof_path which uses the app_id
+     * to create the prefix for each of the laminar-specific woofs
+     */
+    return app_id;
+}
+/**
+ * Called from handlers to set their own static app_id variable from the woof_path
+ * Will retrieve laminar app_id from woof path: lmr here is ns_prefix
+ * woof://host_url/lmrAPPID.woof_type.node_id -> APPID
+ * woof://host_url/lmrAPPID-*.woof_type.node_id -> APPID
+ * sets the process-global app_id
+ * @param woof_path complete woof_path as reference
+ * @return -1 on error, 0 otherwise
+ */
+int set_app_id_from_woof_path(const std::string& woof_path) {
+    const size_t pos = woof_path.find('_');
+    if (pos == std::string::npos) { 
+        log_error("get_app_id_from_woof_path: ns_prefix %s NOT FOUND! %s", (std::string(ns_prefix)).c_str(), woof_path.c_str());
+        return -1;
+    }
+    const std::string app_id_plus_rest = woof_path.substr(pos); //it starts with the underscore!
+    const size_t dash = app_id_plus_rest.find('-');
+    if (dash != std::string::npos) { 
+        app_id = app_id_plus_rest.substr(0, dash);
+    } else {
+        const size_t first_dot = app_id_plus_rest.find('.');
+        app_id = app_id_plus_rest.substr(0, first_dot);
+    }
+    return 0;
+}
 
 int get_curr_host_id() {
     int curr_host_id;
@@ -92,7 +142,7 @@ void retry_sleep(enum RetryType retry_type, int retry_itr) {
 std::string generate_woof_path(
     const DFWoofType woof_type, const int ns, const int node_id, int host_id, const int port_id) {
     std::string host_url;
-    std::string woof_prefix = "lmr";
+    std::string woof_prefix = std::string(ns_prefix) + get_app_id();
 
     // if it is a global woof to a host then ns is -1
     if (ns == -1) {
@@ -142,7 +192,7 @@ std::string generate_woof_path(
 std::string generate_woof_host_url(int host_id) {
     std::string host_url;
     host h;
-    std::string woof_prefix = "lmr";
+    std::string woof_prefix = std::string(ns_prefix) + get_app_id();
 
     if(host_id != get_curr_host_id()) {
     	int err = woof_get(woof_prefix + "." + DFWOOFTYPE_STR[HOSTS_WF_TYPE], &h, host_id);
@@ -150,7 +200,7 @@ std::string generate_woof_host_url(int host_id) {
         	std::cout << "Error read the host info for URL for host id: " << std::to_string(host_id) << std::endl;
         	exit(1);
     	}
-printf("generate_woof_host_url: %s for id %d\n",h.host_url,host_id);
+//printf("generate_woof_host_url: %s for id %d\n",h.host_url,host_id);
     	return(h.host_url);
     } else {
 	return("");
@@ -183,10 +233,26 @@ int get_ns_from_woof_path(const std::string& woof_path) {
     return std::stoi(ns_str);
 }
 
-void laminar_init() {
+void laminar_init(std::string appid_arg) {
+    /* Laminar apps should pass in a unique appID here and after laminar_setup
+     * using set_app_id(appid_arg); to enable multiple apps to run in the 
+     * same namespace.
+     */
 #ifndef ESP8266
     WooFInit();
 #endif
+    // Set the app_id: APP is the default if nothing passed in,
+    // which will conflict if there are multiple apps
+    app_id = "_" + appid_arg;
+    if (appid_arg == "APP") { //APP is the default value passed in, see df_interface.h
+        log_error("laminar_init: Warning -- app_id is not set -- so multiple apps in the same namespace will collide!! Set it by passing in a app-unique string to laminar_init");
+    }
+    // if the app_id contains a . or -, the parser will fail, so disallow this
+    if (app_id.find('.') != std::string::npos
+                || app_id.find('-') != std::string::npos) {
+        log_error("laminar_init: app_id cannot contain a dot or dash: %s", app_id.c_str());
+        exit(1);
+    }
 
     std::string setup_state_woof = generate_woof_path(SETUP_ST_WF_TYPE);
     // check if setup state exists; if not then create it and set state as STARTED
@@ -346,23 +412,63 @@ printf("fire_operand: output_woof: %s, value: %f\n",
 
 int get_result(const int ns, const int id, operand* const res, const unsigned long itr) {
     std::string woof_name = generate_woof_path(OUT_WF_TYPE, ns, id);
+    int ierr;
+    unsigned long iseqno;
 
     // wait till output log has atleast itr number of results
-    while (woof_last_seq(woof_name) < itr) {}
+    while(1) {
+//printf("wf: %s, iseqno: %lu, itr: %lu\n",woof_name.c_str(),iseqno,itr);
+//fflush(stdout);
+    	iseqno = woof_last_seq(woof_name);
+	if(iseqno == (unsigned long)-1) {
+        	std::cerr << "ERROR -- get last seqno for itr " << itr << " failed\n";
+		return(-1);
+	}
+	if(iseqno >= itr) {
+		break;
+	}
+	sleep(1);
+    }
+   // while (woof_last_seq(woof_name) < itr) {sleep(1);}
     //while(WooFGetLatestSeqno(woof_name.c_str()) < itr){}
 
     // keep checking down till the result is of iteration itr
     operand last_op;
     unsigned long seqno = itr;
-    woof_get(woof_name, &last_op, seqno);
+    ierr = woof_get(woof_name, &last_op, seqno);
+    if(ierr < 0) {
+        std::cerr << "ERROR -- get [" << itr << "] at " << iseqno << " from " << woof_name << " failed\n";
+	return(-1);
+    }
+//printf("lastop: wf: %s, seqno: %lu, itr: %lu lastitr: %lu\n",woof_name.c_str(),seqno,itr,last_op.itr);
+//fflush(stdout);
 
     while (last_op.itr != (unsigned long long)itr) {
         // std::cout << last_op.itr << " : " << itr << " : " << seqno <<  std::endl;
         // wait till the next seqno is populated with result
         seqno++;
-        while (woof_last_seq(woof_name) < seqno) {}
+	while(1) {
+		iseqno = woof_last_seq(woof_name);
+//printf("lastop iseq: wf: %s, seqno: %lu, iseqno: %lu itr: %lu lastitr: %lu\n",woof_name.c_str(),seqno,iseqno,itr,last_op.itr);
+//fflush(stdout);
+		if(iseqno == (unsigned long)-1) {
+        		std::cerr << "ERROR -- get last seqno  from " << woof_name << " failed\n";
+			return(-1);
+		}
+		if(iseqno >= seqno) {
+			break;
+		}
+		sleep(1);
+	}
+        //while (woof_last_seq(woof_name) < seqno) {sleep(1);}
         //while (WooFGetLatestSeqno(woof_name.c_str()) < seqno) {}
-        woof_get(woof_name, &last_op, seqno);
+        ierr = woof_get(woof_name, &last_op, seqno);
+//printf("get iseq: wf: %s, seqno: %lu, iseqno: %lu itr: %lu lastitr: %lu\n",woof_name.c_str(),seqno,iseqno,itr,last_op.itr);
+//fflush(stdout);
+	if(ierr < 0) {
+        std::cerr << "ERROR -- get [" << itr << "] at " << seqno << " from " << woof_name << " failed\n";
+		return(-1);
+	}
     }
 
     // fill the result when ready
@@ -538,7 +644,9 @@ std::string graphviz_representation() {
             n++;
 
             if (!(n->operation.category == DF_INTERNAL && n->operation.operation == DF_INTERNAL_OPERAND)) {
-                s++;
+		if(s != subscriptions[ns].end()) {
+                	s++;
+		}
             }
         }
 

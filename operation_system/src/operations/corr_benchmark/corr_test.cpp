@@ -20,6 +20,11 @@ double CORR(double *ds1, double *ds2, int size, double *tval)
 	double t;
 	int i;
 
+	if((size == 0) || (size == 1)) {
+		*tval = 0;
+		return(0.0);
+	}
+
 	/*
 	 * compute the means
 	 */
@@ -50,8 +55,23 @@ double CORR(double *ds1, double *ds2, int size, double *tval)
 		acc += (ds1[i]*ds2[i]);
 	}
 
+	if(((double)size-1)*f_var/((double)size) < 0) {
+		*tval = 0.0;
+		return(0.0);
+	}
+
+	if(((double)size-1)*g_var/((double)size) < 0) {
+		*tval = 0.0;
+		return(0.0);
+	}
+
 	rval = ((acc / (double)size) - f_mu*g_mu) / 
 		(sqrt(((double)size-1)*f_var/(double)size) * sqrt(((double)size-1)*g_var/(double)size));
+
+	if((rval*rval) >= 1.0) {
+		*tval = 100.0;
+		return(0.0);
+	}
 	
 	t = (rval*sqrt((double)size-2.0)) / (sqrt(1.0 - rval*rval));
 	*tval = t;
@@ -160,7 +180,10 @@ int corr_test_node(const struct ts_value* const* operands,
 		crit = 2.776; // value fo 4 df in case oper cnt is 6
 	}
 
-printf("CORR test: corr: %f, crit: %f\n",corr,tval);
+	if(tval < 0) {
+		tval = tval * -1.0;
+	}
+printf("CORR test: corr: %f, t: %f crit: %f\n",corr,tval,crit);
 
 	if((tval > (-1.0*crit)) && (tval < crit)) {
 		result->value.ts_int = 0; // no corrrelation

@@ -513,6 +513,10 @@ double KSCritical(double alpha, double m, double n)
 {
 	double critical;
 
+	if((m == 6.0) && (n == 6.0)) {
+		return(30.0/36.0);
+	}
+
 	critical = sqrt(-0.5 * log(alpha/2.0)) *
                 sqrt((n + m) / (n*m));
 

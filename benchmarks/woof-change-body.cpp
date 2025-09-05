@@ -65,7 +65,7 @@ void WooFChangeBody()
 	} else {
 		iteration = state[0];
 		cycle = state[1];
-printf("body: restarting i: %d c: %d\n",iteration,cycle);
+//printf("body: restarting i: %d c: %d\n",iteration,cycle);
 	}
 
 
@@ -110,6 +110,7 @@ printf("body: restarting i: %d c: %d\n",iteration,cycle);
 		int err = get_result(ns, 4, &result, iteration);
 		if (err < 0) {
 			std::cout << "Failed to read first result " << std::endl;
+			exit(1);
 		} else {
 			printf("Anomaly signal for iteration %d: %d\n", iteration, result.operand_value.value.ts_int);
 		}

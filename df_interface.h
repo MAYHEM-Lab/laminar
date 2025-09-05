@@ -7,11 +7,13 @@
 #include <map>
 #include <set>
 #include <string>
+#pragma once
+#include <string_view>
 
 #define OUTPUT_HANDLER "output_handler"
 #define SUBSCRIPTION_EVENT_HANDLER "subscription_event_handler"
 
-void laminar_init();
+void laminar_init(std::string appid_arg="APP");
 void laminar_setup();
 void laminar_reset();
 
@@ -20,6 +22,7 @@ unsigned long woof_put(const std::string& name, const std::string& handler, cons
 int woof_get(const std::string& name, void* element, unsigned long seq_no, bool print_error = true);
 unsigned long woof_last_seq(const std::string& name);
 
+void set_app_id(std::string app_id);
 void set_host(int host_id);
 void add_host(int host_id,
               const std::string& host_ip,
@@ -40,8 +43,10 @@ enum RetryType get_curr_retry_type();
 void retry_sleep(enum RetryType retry_type, int retry_itr);
 int get_ns_from_woof_path(const std::string& woof_path);
 unsigned long get_node_id_from_woof_path(const std::string& woof_path);
+int set_app_id_from_woof_path(const std::string& woof_path);
 std::string generate_woof_path(DFWoofType woof_type, int ns = -1, int node_id = -1, int host_id = -1, int port_id = -1);
 std::string generate_woof_host_url(int host_id);
+constexpr std::string_view ns_prefix = "lmr";
 
 std::string graphviz_representation();
 

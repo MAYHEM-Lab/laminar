@@ -30,6 +30,7 @@ printf("ANOMALY: ks: %d regress: %d corr: %d\n",ks_test,regress_test,corr_test);
 	corr_test = 1 - corr_test;
 	vote = ks_test + regress_test + corr_test;
 	if(vote <= 1) {
+//	if((ks_test == 0) && (regress_test == 0) && (corr_test == 0)) {
 		result->value.ts_int = 0;
 	} else {
 		result->value.ts_int = 1;

@@ -70,7 +70,7 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
 //printf("subscription handler started\n");
 
     int err;
-    int max_retries = 10;
+    int max_retries = 100000;
 
     // Get name of this woof
 #ifdef CSPOTDEVICE
@@ -82,6 +82,10 @@ extern "C" int subscription_event_handler(WOOF* wf, unsigned long seqno, void* p
     const int node_namespace = get_ns_from_woof_path(woof_name);
     // Extract id
     const unsigned long node_id = get_node_id_from_woof_path(woof_name);
+    // Extract and set app_id
+    err = set_app_id_from_woof_path(woof_name);
+    log_debug("subscription_event_handler: app_id info %s %s", (std::string(ns_prefix)).c_str(), woof_name.c_str());
+
     // Get subscription_event
     auto* subevent = static_cast<subscription_event*>(ptr);
     // Get host retry type
