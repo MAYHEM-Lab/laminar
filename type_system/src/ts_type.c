@@ -176,6 +176,10 @@ bool load_array_value(struct ts_value_array* const array) { // NOLINT(misc-no-re
     uuid_unparse_lower(array->storage_system.id, uuid_string);
     strcat(woof_id, uuid_string);
 
+    while (!woof_exists(woof_id)) {}
+
+    while (WooFGetLatestSeqno(woof_id) == 0) {}
+
     const unsigned long index = WooFGetLatestSeqno(woof_id);
 
     // Stop loading if WooF does not exist or no entry is written
