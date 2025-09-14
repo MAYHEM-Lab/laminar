@@ -101,6 +101,16 @@ enum df_string_ops {
 };
 
 enum df_custom_ops {
+    /* Pass Through (important for sinks: safe operation, that doesn't change the result) */
+    PASS_THROUGH,
+
+    /* Constants */
+    CONSTANT_TRUE,
+    CONSTANT_FALSE,
+    CONSTANT_0,
+    CONSTANT_1,
+    CONSTANT_MINUS_1,
+
     SUM_OF_SQUARES,
 
     /* Matrix Multiplication*/

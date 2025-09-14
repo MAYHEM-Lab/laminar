@@ -19,6 +19,54 @@
 
 #include <chrono>
 
+int pass_through(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    value_deep_set(operands[0], result);
+    return true;
+}
+int constant_true(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_BOOLEAN;
+    result->value.ts_int = true;
+    return true;
+}
+int constant_false(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_BOOLEAN;
+    result->value.ts_int = false;
+    return true;
+}
+int constant_0(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_INTEGER;
+    result->value.ts_int = 0;
+    return true;
+}
+int constant_1(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_INTEGER;
+    result->value.ts_int = 1;
+    return true;
+}
+int constant_minus_1(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_INTEGER;
+    result->value.ts_int = -1;
+    return true;
+}
+
 #ifndef ESP8266
 int compute_sum_of_squares(const struct ts_value* const* operands,
                            const unsigned int operand_count,
@@ -157,6 +205,18 @@ int df_custom_operation(const enum df_custom_ops custom_operation,
     *result = result_value;
 
     switch (custom_operation) {
+        case PASS_THROUGH:
+            return pass_through(operands, operand_count, result_type, result_value);
+        case CONSTANT_TRUE:
+            return constant_true(operands, operand_count, result_type, result_value);
+        case CONSTANT_FALSE:
+            return constant_false(operands, operand_count, result_type, result_value);
+        case CONSTANT_0:
+            return constant_0(operands, operand_count, result_type, result_value);
+        case CONSTANT_1:
+            return constant_1(operands, operand_count, result_type, result_value);
+        case CONSTANT_MINUS_1:
+            return constant_minus_1(operands, operand_count, result_type, result_value);
 #ifndef ESP8266
         case SUM_OF_SQUARES:
             return compute_sum_of_squares(operands, operand_count, result_type, result_value);
