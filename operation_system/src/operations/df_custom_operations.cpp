@@ -66,7 +66,30 @@ int constant_minus_1(const struct ts_value* const* operands,
     result->value.ts_int = -1;
     return true;
 }
-
+int constant_0_0(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_DOUBLE;
+    result->value.ts_double = 0.0;
+    return true;
+}
+int constant_1_0(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_DOUBLE;
+    result->value.ts_double = 1.0;
+    return true;
+}
+int constant_minus_1_0(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    result->type = TS_DOUBLE;
+    result->value.ts_double = -1.0;
+    return true;
+}
 #ifndef ESP8266
 int compute_sum_of_squares(const struct ts_value* const* operands,
                            const unsigned int operand_count,
@@ -217,6 +240,12 @@ int df_custom_operation(const enum df_custom_ops custom_operation,
             return constant_1(operands, operand_count, result_type, result_value);
         case CONSTANT_MINUS_1:
             return constant_minus_1(operands, operand_count, result_type, result_value);
+        case CONSTANT_0_0:
+            return constant_0_0(operands, operand_count, result_type, result_value);
+        case CONSTANT_1_0:
+            return constant_1_0(operands, operand_count, result_type, result_value);
+        case CONSTANT_MINUS_1_0:
+            return constant_minus_1_0(operands, operand_count, result_type, result_value);
 #ifndef ESP8266
         case SUM_OF_SQUARES:
             return compute_sum_of_squares(operands, operand_count, result_type, result_value);

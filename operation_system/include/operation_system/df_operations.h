@@ -110,6 +110,9 @@ enum df_custom_ops {
     CONSTANT_0,
     CONSTANT_1,
     CONSTANT_MINUS_1,
+    CONSTANT_0_0,
+    CONSTANT_1_0,
+    CONSTANT_MINUS_1_0,
 
     SUM_OF_SQUARES,
 
