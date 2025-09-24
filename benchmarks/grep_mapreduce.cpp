@@ -13,7 +13,7 @@
  * The process results in 171693782 lines of english text with ~3.27B words.
  * The data is divided equally (as much as possible) into 25200 files, with newlines replaced with spaces.
  * Mappers in the range from 1 - 100 in steps of 10 can divide data equally, reading only required number of files.
- * Instructions to access the prepared dataset are in cspot-apps/docs/benchmarks.md
+ * Instructions to access the prepared dataset are in laminar/docs/benchmarks.md
 */
 
 #include <unistd.h>
