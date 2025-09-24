@@ -43,7 +43,7 @@ For running multiple configurations and getting stats, use the `~/cspot-apps/dat
 ## Grep Mapreduce
 Fetch the dataset:
 1. `cd ~/laminar/data_local`
-2. `scp -i <private_key> -r ubuntu@wtb.cs.ucsb.edu:/backup6/racelab/laminar_datasets/benchmarks/wikipedia .`
+2. `scp -i <private_key> -r centos@wtb.cs.ucsb.edu:/backup6/racelab/laminar_datasets/benchmarks/wikipedia .`
 
 NOTE: The number of files to be searched is set at 400 by default. If you wish to just try the program, reduce the number `NUM_DATA_FILES` in `cspot-apps/dataflow_multiwoof/benchmarks/grep_mapreduce.cpp` for a faster execution.
 
@@ -86,7 +86,7 @@ For running multiple configurations and getting stats, use the `~/cspot-apps/dat
 
 ## RIoT STATS
 1. `cd ~/laminar/data_local`
-2. `scp -i <private_key> -r ubuntu@wtb.cs.ucsb.edu:/backup6/racelab/laminar_datasets/benchmarks/mhealth .`
+2. `scp -i <private_key> -r centos@wtb.cs.ucsb.edu:/backup6/racelab/laminar_datasets/benchmarks/mhealth .`
 
 Assuming cspot-apps is built and binaries are ready:
 - `cd ~/laminar && cp ~/cspot-apps/build/bin/riot_stats .`
