@@ -90,6 +90,76 @@ int constant_minus_1_0(const struct ts_value* const* operands,
     result->value.ts_double = -1.0;
     return true;
 }
+int math_max(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    if (result_type == TS_INTEGER) {
+        result->type = TS_INTEGER;
+        result->value.ts_int = operands[0]->value.ts_int;
+        for (unsigned int i = 1; i < operand_count; i++) {
+            if (operands[i]->type != TS_INTEGER) {
+                log_type_mismatch(TS_INTEGER, operands[i]->type);
+                return false;
+            }
+            if (operands[i]->value.ts_int > result->value.ts_int) {
+                result->value.ts_int = operands[i]->value.ts_int;
+            }
+        }
+    } else if (result_type == TS_DOUBLE) {
+        result->type = TS_DOUBLE;
+        result->value.ts_double = operands[0]->value.ts_double;
+        for (unsigned int i = 1; i < operand_count; i++) {
+            if (operands[i]->type != TS_DOUBLE) {
+                log_type_mismatch(TS_DOUBLE, operands[i]->type);
+                return false;
+            }
+            if (operands[i]->value.ts_double > result->value.ts_double) {
+                result->value.ts_double = operands[i]->value.ts_double;
+            }
+        }
+    } else {
+        log_error("Not Implemented");
+        return false;
+    }
+    return true;
+}
+
+int math_min(const struct ts_value* const* operands,
+                           const unsigned int operand_count,
+                           const enum ts_types result_type,
+                           struct ts_value* const result) {
+    if (result_type == TS_INTEGER) {
+        result->type = TS_INTEGER;
+        result->value.ts_int = operands[0]->value.ts_int;
+        for (unsigned int i = 1; i < operand_count; i++) {
+            if (operands[i]->type != TS_INTEGER) {
+                log_type_mismatch(TS_INTEGER, operands[i]->type);
+                return false;
+            }
+            if (operands[i]->value.ts_int < result->value.ts_int) {
+                result->value.ts_int = operands[i]->value.ts_int;
+            }
+        }
+    } else if (result_type == TS_DOUBLE) {
+        result->type = TS_DOUBLE;
+        result->value.ts_double = operands[0]->value.ts_double;
+        for (unsigned int i = 1; i < operand_count; i++) {
+            if (operands[i]->type != TS_DOUBLE) {
+                log_type_mismatch(TS_DOUBLE, operands[i]->type);
+                return false;
+            }
+            if (operands[i]->value.ts_double < result->value.ts_double) {
+                result->value.ts_double = operands[i]->value.ts_double;
+            }
+        }
+    } else {
+        log_error("Not Implemented");
+        return false;
+    }
+    return true;
+}
+
 #ifndef ESP8266
 int compute_sum_of_squares(const struct ts_value* const* operands,
                            const unsigned int operand_count,
@@ -246,6 +316,10 @@ int df_custom_operation(const enum df_custom_ops custom_operation,
             return constant_1_0(operands, operand_count, result_type, result_value);
         case CONSTANT_MINUS_1_0:
             return constant_minus_1_0(operands, operand_count, result_type, result_value);
+        case MATH_MAX:
+            return math_max(operands, operand_count, result_type, result_value);
+        case MATH_MIN:
+            return math_min(operands, operand_count, result_type, result_value);
 #ifndef ESP8266
         case SUM_OF_SQUARES:
             return compute_sum_of_squares(operands, operand_count, result_type, result_value);
