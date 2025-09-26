@@ -114,6 +114,10 @@ enum df_custom_ops {
     CONSTANT_1_0,
     CONSTANT_MINUS_1_0,
 
+    /* Math */
+    MATH_MAX,
+    MATH_MIN,
+
     SUM_OF_SQUARES,
 
     /* Matrix Multiplication*/
