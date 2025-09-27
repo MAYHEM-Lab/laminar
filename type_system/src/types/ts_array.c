@@ -617,7 +617,7 @@ struct ts_value* value_from_string_array(const char* array[], const size_t size)
 }
 
 char** value_to_string_array(const struct ts_value* const value) {
-    char** return_array = malloc(value->value.ts_array.size * sizeof *return_array);
+    char** return_array = malloc(value->value.ts_array.size * sizeof(char *));
     get_string_array(return_array, value);
     return return_array;
 }
