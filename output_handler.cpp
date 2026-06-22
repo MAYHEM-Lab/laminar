@@ -23,7 +23,7 @@ extern "C" int output_handler(WOOF* wf, unsigned long seqno, void* ptr) {
 #ifdef CSPOTDEVICE
     const std::string woof_name(wf);
 #else
-    const std::string woof_name(WoofGetFileName(wf));
+    const std::string woof_name(WooFGetFileName(wf));
 #endif
     // Extract namespace
     const int node_namespace = get_ns_from_woof_path(woof_name);
